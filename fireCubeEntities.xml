@@ -1,0 +1,487 @@
+<root>
+	<schemas>
+		<!-- @shadow_light: light tag  @cur_shadow : _no_shadow/_regular_shadow/_PCF_shadow-->
+		<schema tag="COMPONENT" schama=" GlobalConfig: 	@tag/{STRING}
+														@amb_factor/{FLOAT, FLOAT, FLOAT}
+														@shadow_light/{STRING}
+														@cur_shadow/{STRING}
+														@display_light_wire/{STRING}
+											"/>
+		<!-- @input: forward/back/left/right/turn/attack @orientation : left_down/left_up/right_down/right_up @origin : relative coordinate [0,1] {x_origian, y_origin} @size : relative [0,1] {width, height} @background : background texture name-->
+		<schema tag="COMPONENT" schama=" View: 	@tag/{STRING}
+												@class/{STRING} 
+												@input_token/{STRING}
+												@controller/{STRING}
+												@subViews/{...}
+												@corner/{STRING} 
+												@frame/{FLOAT, FLOAT, FLOAT, FLOAT} 
+												@background/{STRING} "/>
+		<!-- class : {scene/ui} size : {width[0.0 1.0], height[0.0 1.0]}/{0.0,0.0} or missing from its view -->
+		<schema tag="COMPONENT" schama=" Framebuffer: 	@tag/{STRING}
+														@class/{STRING} 
+														@size/{FLOAT, FLOAT}"/>
+		<!-- " ShaderProgram: @class/{STRING} @vertex/{...} @fragment/{...} " -->
+		<schema tag="COMPONENT" schama=" ShaderProgram: @tag/{STRING} 
+														@vertex/{...} 
+														@fragment/{...} "/>
+		<!-- for deferred shader @gbuffer: shdow/depth/gbuffer 
+								 @glight : lightshader
+			 for others none
+		-->
+		<schema tag="COMPONENT" schama=" Shader: @class/{STRING} 
+												 @tag/{STRING} 
+												 @program/{STRING}
+												 @depth_shader/{STRING}
+												 @shadow_shader/{STRING}
+												 @gbuffer_shader/{STRING}
+												 @lighting_shader/{STRING}
+												 "/>
+		<schema tag="COMPONENT" schama=" Texture: 	@tag/{STRING} 
+													@type/{STRING} 
+													@storage/{STRING}"/>
+		<!-- nearest/bilinear/trilinear -->
+		<schema tag="COMPONENT" schama=" Sampler: 	@tag/{STRING}"/>		
+		<!-- 
+			@type:grid, @defaultParam: width, height, w_div_num, h_div_num, w_max_u_tex_coord, h_max_v_tex_coord
+			@type:cube, @defaultParam: wdge_length
+			@type:sphere, @default/{radius, slice_num, stack_num}
+			@type:torus, @default/{inner_radius, outer_radius, side_num, ring_num}
+		 -->
+		<schema tag="COMPONENT" schama=" Primitive: @tag/{STRING} 
+													@defaultGeoParam/{...} 
+													@storage/{STRING}"/>
+		<!-- @geoParam: the same as Primitive or missed, for simplicity, do not use geoParam, instead, use defaultGeoParam in primitive -->
+		<schema tag="COMPONENT" schama=" Model: @type/{STRING} 
+											   @tag/{STRING} 
+											   @geoParam/{...} 
+											   @transform/{...} 
+											   @rot/{...} 
+											   @scale/{FLOAT, FLOAT, FLOAT} 
+											   @mat_Kd/{FLOAT, FLOAT, FLOAT} 
+											   @mat_Ks/{FLOAT, FLOAT, FLOAT} 
+											   @shininess/{FLOAT}
+											   @tex_diffuse/{STRING}
+											   @tex_normal/{STRING}
+											   @tex_sampler/{STRING}
+											   @tex_tile/{FLOAT}"/>
+		<!-- light : @type -{directional/point/spot} @position/{x,y,z} @intensity/{0.5,0.5,0.5} @spot_direction/{x, y, z, 20(angle_control)} @attenuation/{a0, a1, a2, far_distance}-->
+		<schema tag="COMPONENT" schama=" Light: @type/{STRING} 
+												@tag/{STRING} 
+												@wireColor/{FLOAT, FLOAT, FLOAT} 
+												@position/{FLOAT, FLOAT, FLOAT} 
+												@intensity/{FLOAT, FLOAT, FLOAT} 
+												@spot_dir/{FLOAT, FLOAT, FLOAT, FLOAT} 
+												@attenuation/{FLOAT, FLOAT, FLOAT, FLOAT}" />	
+		<!-- Renderable: @geometry/{STRING, FLOAT, FLOAT, FLOAT, FLOAT, FLOAT, FLOAT} @material/{FLOAT, FLOAT, FLOAT} @texture/{FLOAT, STRING, STRING} -->
+		<schema tag="COMPONENT" schama=" Renderable: @geometry/{STRING, FLOAT, FLOAT, FLOAT, FLOAT, FLOAT, FLOAT} @material/{FLOAT, FLOAT, FLOAT} @texture/{FLOAT, STRING, STRING}"/>
+		<!-- transform : @TRANSLATION - vec3; @ROTATION radian,vec3 - rotatation axis; @SCALE - vec3 -->
+		<schema tag="COMPONENT" schama=" Transform: @TRANSLATION/{FLOAT, FLOAT, FLOAT} @SCALE/{FLOAT, FLOAT, FLOAT} @ROTATION/{FLOAT, FLOAT, FLOAT, FLOAT}"/>
+		<!-- @FIELDS : x, y, z-->
+		<schema tag="COMPONENT" schama=" Movement: @DISPLACEMENT/{FLOAT, FLOAT, FLOAT}"/>
+		<!-- @FIELDS : x, y, z-->
+		<schema tag="COMPONENT" schama=" Velocity: @FIELD/{FLOAT, FLOAT, FLOAT}"/>
+		<!-- camera : camera id or name, @fov : degree, @min_z_axis_angle : degree-->
+		<schema tag="COMPONENT" schama=" Camera: @class/{STRING} 
+												 @tag/{STRING}
+												 @position/{FLOAT, FLOAT, FLOAT}
+												 @front_dir/{FLOAT, FLOAT, FLOAT}
+												 @up_dir/{FLOAT, FLOAT, FLOAT}
+												 @fov/{FLOAT}
+												 @near_plane_distance/{FLOAT}
+												 @far_plane_distance/{FLOAT}
+												 @min_z_axis_angle/{FLOAT}
+												 "/>
+	</schemas>
+	<entities>
+		<!-- GlobalConfig @cur_shadow : no_shadow/regular_shadow/PCF_shadow -->
+		<entity id="3D6922E3-F45E-4F2F-8A93-E1A090341F221"
+				component="GlobalConfig: @tag/{global_option}
+										 @amb_factor/{0.1, 0.1, 0.1}
+										 @shadow_light/{light_0}
+										 @cur_shadow/{no_shadow}
+										 @display_light_wire/{off}
+									"/>
+		<!-- Shaders /GShaderShadow/GShaderDepth/GShaderGBuffer/GShaderLighting/GShaderDeferred -->
+		<entity id="8ED5A018-0359-4F41-89DA-8CD2C2CF0BD1"
+				component="Shader: 	@class/{GShaderShadow}
+									@tag/{_shader_shadow}
+									@program/{__draw_depth_shadow}
+									"/>
+		<entity id="54B25797-1C1D-40E5-BD6D-41621CA95AE5"
+				component="Shader: 	@class/{GShaderDepth}
+									@tag/{_shader_depth}
+									@program/{__draw_depth_shadow}
+									"/>
+		<entity id="D408094D-9D53-424F-B1DD-C39F267EDFDA"
+				component="Shader: 	@class/{GShaderGBuffer}
+									@tag/{_shader_gbuffer}
+									@program/{__ds_gbuffer}
+									"/>
+		<entity id="57F28F46-6027-4DC0-992C-AADA8DEB2540"
+				component="Shader: 	@class/{GShaderGBuffer}
+									@tag/{_shader_gbuffer_shadow}
+									@program/{__ds_gbuffer_shadow}
+									"/>
+		<entity id="402986BF-3030-4799-AED3-5681DD95F5ED"
+				component="Shader: 	@class/{GShaderGBuffer}
+									@tag/{_shader_gbuffer_shadow_PCF}
+									@program/{__ds_gbuffer_shadow_PCF}
+									"/>
+		<entity id="21663BB0-548B-4CFA-B8D7-EE0D8280E6DD"
+				component="Shader: 	@class/{GShaderLighting}
+									@tag/{_shader_lighting}
+									@program/{__ds_draw_light}
+									"/>
+		<entity id="5426B18E-48B1-4E9C-8D92-D6BF8BCA7780"
+				component="Shader: 	@class/{GShaderDeferred}
+									@tag/{_shader_deferred}
+									@depth_shader/{_shader_depth}
+									@shadow_shader/{_shader_shadow}
+									@gbuffer_shader/{_shader_gbuffer}
+									@lighting_shader/{_shader_lighting}
+									"/>
+		<entity id="3D6922E3-F45E-4F2F-8A93-E1A090341F22"
+				component="Shader: 	@class/{GShaderBackground}
+									@tag/{_shader_background}
+									@program/{__draw_image}
+									"/>
+									
+									
+		<!-- for shader program -->
+		<entity id="F7E1E936-D3C0-4C60-B958-5960DF45F192"
+				component=" ShaderProgram: 	@tag/{__draw_depth_shadow} 
+											@vertex/{draw_depth_shadow.vs} 
+											@fragment/{draw_depth_shadow.fs} "/>
+		<entity id="0916DF85-A0D6-40D6-A591-AE96623B278E" 
+				component=" ShaderProgram: @tag/{__ds_gbuffer} 
+											@vertex/{opengl_es_3.0.h, ds_gbuffer.vs} 
+											@fragment/{opengl_es_3.0.h, ds_gbuffer.fs} "/>
+		<entity id="38B9F2FF-2996-4E4C-ADCD-12D2027E1A9B" 
+				component=" ShaderProgram: @tag/{__ds_gbuffer_shadow} 
+											@vertex/{opengl_es_3.0.h, shadow_flag.h, ds_gbuffer.vs} 
+											@fragment/{opengl_es_3.0.h, shadow_flag.h, ds_gbuffer.fs} "/>
+		<entity id="19B46988-7A02-4557-915A-244F40CC7223" 
+				component=" ShaderProgram: @tag/{__ds_gbuffer_shadow_PCF} 
+											@vertex/{opengl_es_3.0.h, shadow_flag.h, ds_gbuffer.vs} 
+											@fragment/{opengl_es_3.0.h, shadow_flag.h, shadow_PCF_flag.h, ds_gbuffer.fs}"/>
+		<entity id="76CC7DE3-B80E-44CD-ABF5-B79840DDFA25" 
+				component=" ShaderProgram: @tag/{__ds_draw_light} 
+											@vertex/{opengl_es_3.0.h, ds_draw_light.vs} 
+											@fragment/{opengl_es_3.0.h, ds_draw_light.fs} "/>
+		<entity id="86CF8D2D-6142-431F-9E6F-D7E4DFA0C0D0" 
+				component=" ShaderProgram: @tag/{__draw_image} 
+											@vertex/{draw_image.vs} 
+											@fragment/{draw_image.fs} "/>
+		<entity id="0AB3DE7C-F0BB-4200-A50D-9BC316B4373C" 
+				component=" ShaderProgram: @tag/{__draw_texture} 
+											@vertex/{draw_texture.vs} 
+											@fragment/{draw_texture.fs} "/>
+		<entity id="B5F67582-DE55-4F78-B70F-BDB3EB9A52FD" 
+				component=" ShaderProgram: @tag/{__draw_color} 
+											@vertex/{draw_color.vs} 
+											@fragment/{draw_color.fs} "/>
+		<entity id="C644230D-8C81-493D-9704-F1CD9923CF5D" 
+				component=" ShaderProgram: @tag/{__draw_shadow_test} 
+											@vertex/{draw_shadow_test.vs} 
+											@fragment/{draw_shadow_test.fs}"/>
+
+		<!-- frame buffer -->
+		<entity id="074495F6-2FD2-4271-92B9-99317AC5EC35"
+				component=" Framebuffer: @tag/{_scene} @class/{GFramebufferDeferred}"/>
+		<entity id="A760FF7C-D493-430E-A352-256173E57E58"
+				component=" Framebuffer: @tag/{_ui} @class/{GFramebufferDeferred} @size/{0.5, 0.2}"/>
+		<!-- Camera temporary -->
+		<entity id="8265DE02-2343-43F3-ABF9-A512C9312AB4"
+				component="Camera: 	@class/{GShadowCamera}
+									@tag/{_shadow_camera}
+									@fov/{90.0}
+									@near_plane_distance/{0.01}
+									@far_plane_distance/{200}
+									"/>
+		<entity id="A1843C52-9B02-48E8-BC0C-AB1DE7E0CB92"
+				component="Camera: 	@class/{GFPCamera}
+									@tag/{_scene_camera}
+									@position/{3.0, -3.0, 2.5}
+									@front_dir/{0.0, 1.0, 0.0}
+									@up_dir/{0.0, 0.0, 1.0}
+									@fov/{90.0}
+									@near_plane_distance/{0.01}
+									@far_plane_distance/{200}
+									@min_z_axis_angle/{2.0}
+									"/>
+		<!-- lights -->
+		<entity id="4D4CE16C-2732-4B72-AF95-72FD0C40BB8E"
+				component="Light: 	@type/{cone}
+									@tag/{light_0}
+									@wireColor/{0.0, 0.0, 1.0} 
+									@position/{-3.0, -3.0, 1.5} 
+									@intensity/{0.8, 0.8, 0.8} 
+									@spot_dir/{1.0, 1.0, -.4, 4.0} 
+									@attenuation/{1.0, 0.0, 0.0, 20.0}"
+									/>
+		<entity id="0D5AE31A-9B4E-4652-ADA5-E0D207AB7E9B"
+				component="Light: 	@type/{point} 
+									@tag/{light_1}
+									@wireColor/{1.0, 0.0, 0.0} 
+									@position/{5.0, 5.0, 5.0} 
+									@intensity/{.5, .5, .5} 
+									@attenuation/{1.0, 0.0, 0.0, 20.0}"
+									/>
+		<entity id="CF2F5BE8-CA99-4C8D-9783-8FD274FCA38D"
+				component="Light: 	@type/{cone} 
+									@tag/{light_2} 
+									@wireColor/{0.0, 0.0, 1.0} 
+									@position/{-3.0, 10.0, 3.0} 
+									@intensity/{0.3, .3, .3} 
+									@spot_dir/{1.0, -1.0, -0.1, 3.0} 
+									@attenuation/{0.0, 0.0, 0.01, 20.0}"
+									/>	
+	
+		<!--Model -->
+		<entity id="DB5F2CC1-1F79-4C1C-8F37-7760883FDDD1"
+				component=" Model: @type/{grid} 
+								  @tag/{floor_1}
+								  @geoParam/{10.0, 10.0, 1.0, 1.0, 10, 1.0}
+								  @transform/{translate, 5.0, 5.0, 0.0} 
+								  @mat_Kd/{.9, .93, .61} 
+								  @mat_Ks/{.3, .3, 0.3} 
+								  @shininess/{2.0}
+								  @tex_diffuse/{Floor}
+								  @tex_sampler/{bilinear}
+								  @tex_tile/{1.0}"/>
+		<entity id="80EB0C44-650C-4CC7-9EE6-C3E54CACC623"
+				component=" Model: @type/{grid} 
+								  @tag/{wall_1}
+								  @geoParam/{10.0, 4.0, 1.0, 1.0, 10, 1.0}
+								  @transform/{rotate, 90, 1.0, 0.0, 0.0, translate, 5.0, 10.0, 2.0} 
+								  @mat_Kd/{0.93,0.93,0.93} 
+								  @mat_Ks/{0.4,0.4,0.4} 
+								  @shininess/{1.0}
+								  @tex_diffuse/{Brick1}
+								  @tex_sampler/{bilinear}
+								  @tex_tile/{1.0}"/>
+		<entity id="77E3A8A1-A1E4-400F-83D8-EB6FC776F0AD"
+				component=" Model: @type/{grid} 
+								  @tag/{wall_2}
+								  @geoParam/{10.0, 4.0, 1.0, 1.0, 10, 1.0}
+								  @transform/{rotate, 90, 1.0, 0.0, 0.0, rotate, -90,0.0,0.0,1.0, translate, 10.0, 5.0, 2.0}
+								  @mat_Kd/{0.93,0.93,0.93} 
+								  @mat_Ks/{0.4,0.4,0.4} 
+								  @shininess/{1.0}
+								  @tex_diffuse/{Brick1}
+								  @tex_sampler/{bilinear}
+								  @tex_tile/{1.0}"/>
+		<entity id="1C119F57-C914-45DC-8009-FFD4695BB6B9"
+				component=" Model: @type/{cube} 
+								  @tag/{cube_1}
+								  @transform/{rotate, 30, 0.0, 1.0, 0.0, translate, 0.5, 0.5, 0.5, translate, 7.0, 1.0, 0.0}
+								  @mat_Kd/{0.70, 0.27, 0.082} 
+								  @mat_Ks/{0.70, 0.27, 0.082} 
+								  @shininess/{2.8}
+								  @tex_diffuse/{Brick1}
+								  @tex_sampler/{bilinear}
+								  @tex_tile/{1.0}"/>
+		<entity id="8E934B37-C429-4477-BC20-F32D87AF2DEF"
+				component=" Model: @type/{sphere} 
+								  @tag/{sphere_1}
+								  @geoParam/{0.7, 36, 20}
+								  @transform/{translate, 2.0, 1.0, .7}
+								  @mat_Kd/{0.70, 0.27, 0.082} 
+								  @mat_Ks/{0.70, 0.27, 0.082} 
+								  @shininess/{2.8}
+								  @tex_diffuse/{Brick1}
+								  @tex_sampler/{bilinear}
+								  @tex_tile/{1.0}"/>
+		<entity id="82CB1B7E-1C73-4C36-A465-1C5422E5CE3A"
+				component=" Model: @type/{torus} 
+								  @tag/{torus_1}
+								  @geoParam/{0.75,0.25,30,30}
+								  @transform/{translate, 4.0, 6.0, 0.25} 
+								  @mat_Kd/{0.75,0.60,0.22} 
+								  @mat_Ks/{0.62,0.55,0.36} 
+								  @shininess/{51.2}
+								  @tex_diffuse/{Brick1}
+								  @tex_sampler/{bilinear}
+								  @tex_tile/{1.0}"/>
+		<entity id="11315629-3E03-42BB-98AF-D555B8A85EBE"
+				component=" Model: @type/{teapot} 
+								  @tag/{teapot_1}
+								  @geoParam/{14}
+								  @transform/{translate, 3.0, 0.0, 0.0}
+								  @mat_Kd/{0.75,0.60,0.22} 
+								  @mat_Ks/{0.62,0.55,0.36} 
+								  @shininess/{51.2}
+								  @tex_diffuse/{Floor}
+								  @tex_sampler/{bilinear}
+								  @tex_tile/{1.0}"/>
+		<entity id="F8F4210F-4E2B-40E7-92D1-3AE452527449"
+				component=" Model: @type/{obj} 
+								  @tag/{bs_ears_1}
+								  @transform/{rotate, 90, 1.0, 0.0, 0.0, rotate, -30, 0.0, 0.0, 1.0, translate, 5.5, 1.5, 0.5} 
+								  @mat_Kd/{1.0,1.0,1.0} 
+								  @mat_Ks/{0.4,0.4,0.4} 
+								  @shininess/{2.3}
+								  @tex_diffuse/{Ogre_diffuse}
+								  @tex_normal/{Ogre_normalmap}
+								  @tex_sampler/{bilinear}
+								  @tex_tile/{1.0}"/>
+		<entity id="3A76B143-62C8-4573-96E5-F96A0C770230"
+				component=" Model: @type/{obj} 
+								  @tag/{bs_ears_2}
+								  @transform/{rotate, 90, 1.0, 0.0, 0.0, rotate, -30, 0.0, 0.0, 1.0, translate, 3.2, 3.5, 0.5} 
+								  @mat_Kd/{1.0,1.0,1.0} 
+								  @mat_Ks/{0.4,0.4,0.4} 
+								  @shininess/{2.3}
+								  @tex_diffuse/{Ogre_diffuse}
+								  @tex_normal/{Ogre_normalmap}
+								  @tex_sampler/{bilinear}
+								  @tex_tile/{1.0}"/>
+
+		<!-- views -->
+		<entity id="F2D23E84-8739-402C-B978-A1E16473F779"
+				component=" View: 	@tag/{__window} 
+									@class/{GWindow} 
+									@subViews/{root_view}"/>
+		<entity id="340011F6-D7CD-4848-9EA6-6478A9702E90"
+				component=" View: 	@tag/{root_view} 
+									@class/{GRootView} 
+									@controller/{GController} 
+									@subViews/{track_scene_view, text_view,touch_track_button}"
+									/>
+		<entity id="42C4CA56-65FD-4F3C-8AFC-3A965C8A8362"
+				component=" View: 	@tag/{text_view}
+									@class/{GView} 
+									@corner/{left_up} 
+									@frame/{0, 0, 0.5, 0.2} 
+									@background/{old_great_wall}"/>
+		<entity id="44741CC4-1DEA-4DA2-9727-7ABBA2D20966"
+				component=" View: @tag/{touch_track_button} 
+									@class/{GView} 
+									@corner/{left_up} 
+									@frame/{0.5, 0, 0.5, 0.2} 
+									@background/{wallpaper_face_wall}"/>
+		<entity id="074495F6-2FD2-4271-92B9-99317AC5EC35"	
+				component=" View: @tag/{track_scene_view} 
+									@class/{GSceneView}
+									@input_token/{turn}
+									@subViews/{w_button,a_button,s_button,d_button,fire_button}
+									@corner/{left_down} 
+									@frame/{0, 0, 1, 0.8} "/>
+		<entity id="96A5E125-38A3-47C2-B08C-57916D12988C"
+				component=" View: 	@tag/{w_button}
+									@class/{GView}
+									@input_token/{forward}
+									@corner/{left_down} 
+									@frame/{0, 0, 0.1, 0.2} 
+									@background/{w_button}"/>
+		<entity id="F181B0D7-5810-4ABF-9770-8C61A599C0ED"
+				component=" View: 	@tag/{a_button}
+									@class/{GView} 
+									@input_token/{left}
+									@corner/{left_down} 
+									@frame/{0, 0, 0.1, 0.2} 
+									@background/{a_button}"/>
+		<entity id="0721527E-D40A-4C19-BDEB-02ED9152BA12"
+				component=" View: 	@tag/{s_button}
+									@class/{GView} 
+									@input_token/{back}
+									@corner/{left_down} 
+									@frame/{0, 0, 0.1, 0.2} 
+									@background/{s_button}"/>
+		<entity id="879F9A76-4FA1-4EBF-ACDF-4E75AA1057ED"
+				component=" View: 	@tag/{d_button}
+									@class/{GView} 
+									@input_token/{right}
+									@corner/{left_up} 
+									@frame/{0, 0, 0.1, 0.2} 
+									@background/{d_button}"/>
+		<entity id="E2CD4D27-681E-4621-BB01-E71853736A03"
+				component=" View: 	@tag/{fire_button}
+									@class/{GView}
+									@input_token/{attack}
+									@corner/{left_down} 
+									@frame/{0, 0, 0.1, 0.2} 
+									@background/{fire_button}"/>
+									
+		<!-- for textures -->
+		<!-- " Texture: @name/{STRING} @type/{STRING} @sampler/{STRING} @storage/{STRING}" -->
+		<entity id="65E6DDC4-5972-4B88-B32F-C749742EB035" 
+				component=" Texture: @tag/{w_button} @type/{diffuse} @storage/{key_w_120.png} "/>
+		<entity id="A5727A35-5BCD-4E92-91AD-DEC23D1F878A" 
+				component=" Texture: @tag/{a_button} @type/{diffuse} @storage/{key_a_120.png} "/>
+		<entity id="8802766D-1708-40E7-A9D2-63CD5CB37C3D" 
+				component=" Texture: @tag/{s_button} @type/{diffuse} @storage/{key_s_120.png} "/>
+		<entity id="F82F24AB-60C9-4FEB-B5EB-3A643D26189E" 
+				component=" Texture: @tag/{d_button} @type/{diffuse} @storage/{key_d_120.png} "/>
+		<entity id="CBF63C37-F6EE-4826-B130-28D7380DB656" 
+				component=" Texture: @tag/{fire_button} @type/{diffuse} @storage/{key_fire_240.png} "/>
+		<entity id="D8B08331-A092-4D8C-B44B-1976E463E072" 
+				component=" Texture: @tag/{world_map} @type/{diffuse} @storage/{world_map.jpeg} "/>
+		<entity id="CF0ADBCE-34A1-4C73-9ECD-B7BB1FA3BC08" 
+				component=" Texture: @tag/{wallpaper_qing_he} @type/{diffuse} @storage/{wallpaper_qing_he.jpg} "/>
+		<entity id="04799D1A-1AEB-4B6B-B9D6-933F92A7ADD6" 
+				component=" Texture: @tag/{Old_Southeast_Asia_Map} @type/{diffuse} @storage/{Old_Southeast_Asia_Map.jpg} "/>
+		<entity id="BC688F48-0DE6-4A91-B74D-811499E9D02E" 
+				component=" Texture: @tag/{old_great_wall} @type/{diffuse} @storage/{old_great_wall.jpg} "/>
+		<entity id="F2C444BF-FD3D-4A94-B272-9BFC4AB5735B" 
+				component=" Texture: @tag/{wallpaper_man_road} @type/{diffuse} @storage/{wallpaper_man_road.jpeg} "/>
+		<entity id="081B4069-DC84-4A3A-BE65-B3605AD91155" 
+				component=" Texture: @tag/{wallpaper_building_road_black} @type/{diffuse} @storage/{wallpaper_building_road_black.jpeg} "/>
+		<entity id="B0CF9008-A9A9-4609-89C2-A68E1DD65420" 
+				component=" Texture: @tag/{wallpaper_building_road} @type/{diffuse} @storage/{wallpaper_building_road.jpeg} "/>
+		<entity id="7DAE1070-57F2-4A4B-931D-A51B74C8B66E" 
+				component=" Texture: @tag/{wallpaper_wall_tree} @type/{diffuse} @storage/{wallpaper_wall_tree.jpeg} "/>
+		<entity id="37094FD7-EB04-4975-A8CF-01565F4C7A2C" 
+				component=" Texture: @tag/{wallpaper_wall} @type/{diffuse} @storage/{wallpaper_wall.jpeg} "/>
+		<entity id="565478D2-0FD6-4F0E-AE1B-ABA86B195109" 
+				component=" Texture: @tag/{wallpaper_face_wall} @type/{diffuse} @storage/{wallpaper_wall_tree.jpeg} "/>
+		<entity id="2D86B5E9-B077-4C58-B0F5-97CF7A7088EA" 
+				component=" Texture: @tag/{wallpaper_black_wall} @type/{diffuse} @storage/{wallpaper_black_wall.jpeg} "/>
+		<entity id="6A4A6C40-EB54-4770-84C5-F5C9C9137A1D" 
+				component=" Texture: @tag/{wallpaper_old_book} @type/{diffuse} @storage/{wallpaper_old_book.jpg} "/>
+		<entity id="694AAD97-2F07-40CB-8C2E-2014CEC1BD4E" 
+				component=" Texture: @tag/{wallpaper_hand_writing} @type/{diffuse} @storage/{wallpaper_hand_writing.jpg} "/>
+		<entity id="2D950F6A-06E6-4E9A-B7CE-DB83FEE5BDA9" 
+				component=" Texture: @tag/{wallpaper} @type/{diffuse} @storage/{wallpaper.jpeg} "/>
+		<entity id="A439716E-23EA-41C1-99C5-BC8B3D4D19C2" 
+				component=" Texture: @tag/{Brick1} @type/{diffuse} @storage/{brick1.jpg} "/>
+		<entity id="D49E5FC9-46FE-47A3-AA60-6D62E008021A" 
+				component=" Texture: @tag/{Floor} @type/{diffuse} @storage/{floor_diffuse.png} "/>
+		<entity id="76358641-ADB4-4571-8AE4-A9808B4CD4FD" 
+				component=" Texture: @tag/{Floor_normal} @type/{normal} @storage/{floor_nmap.png} "/>
+		<entity id="ABC46C40-F151-4422-9552-82E06333BE6E" 
+				component=" Texture: @tag/{Cement} @type/{diffuse} @storage/{cement.jpg} "/>
+		<entity id="47B16851-A1B2-4499-94A6-5593C2F714CC" 
+				component=" Texture: @tag/{Moss} @type/{diffuse} @storage/{moss.png} "/>
+		<entity id="BA90D4C2-72EF-49F9-BEFF-5B451DE538D8" 
+				component=" Texture: @tag/{Ogre_diffuse} @type/{diffuse} @storage/{ogre_diffuse.png} "/>
+		<entity id="D7E21C02-DECA-46D5-8B28-28B0B80CD291" 
+				component=" Texture: @tag/{Ogre_normalmap} @type/{normal} @storage/{ogre_normalmap.png} "/>							
+		
+		<!-- Sampler -->
+		<entity id="0BA35DB0-918E-4500-ACA7-7C4C683A9CE1" 
+				component=" Sampler: @tag/{nearest}"/>
+		<entity id="8A30E00E-11A8-4771-AB81-A8F0551CA6A1" 
+				component=" Sampler: @tag/{bilinear}"/>
+		<entity id="D374B4F9-B257-47D1-AAC1-6952DDD44FBC" 
+				component=" Sampler: @tag/{trilinear}"/>
+				
+		<!-- for primitive -->
+		<entity id="CC9A2C94-4D1C-4EB2-9E26-CCCED9CDBFA9" 
+				component=" Primitive: @tag/{grid} @defaultGeoParam/{1.0, 1.0, 1, 1, 1.0, 1.0}"/>
+		<entity id="E7D8358B-B2F8-4C23-B26E-24E274A46676" 
+				component=" Primitive: @tag/{cube} @defaultGeoParam/{1.0}"/>
+		<entity id="BD618CF6-B557-42C8-8B90-60A58D33F51B" 
+				component=" Primitive: @tag/{sphere} @defaultGeoParam/{1.0, 36, 20}"/>
+		<entity id="E2CB660C-2117-49FB-A824-A2697A13C633" 
+				component=" Primitive: @tag/{torus} @defaultGeoParam/{0.75, 0.25, 36, 36}"/>
+		<entity id="C8CA9B9A-FD08-4531-BBEE-7B16C795F464" 
+				component=" Primitive: @tag/{teapot} @defaultGeoParam/{14}"/>
+		<entity id="B1091D59-2FF1-40AC-B78B-F1F0BB0BCE4D" 
+				component=" Primitive: @tag/{obj} @storage/{bs_ears.obj}"/>
+		<entity id="2E6D0392-8D70-43DB-A4CC-21CD5B3F5762" 
+				component=" Primitive: @tag/{lightCone}"/>
+		<entity id="3691730E-29AF-46C9-A7D7-9297E61A8B53" 
+				component=" Primitive: @tag/{lightSphere}"/>
+	</entities>	
+</root>
