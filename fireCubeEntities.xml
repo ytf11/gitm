@@ -1,4 +1,4 @@
-<root> sakdlnaskldnaslkdansmlkdanmdlandmalkdnasldknalkdanslkdan
+<root> v 1.2
 	<schemas>
 		<!-- @shadow_light: light tag  @cur_shadow : _no_shadow/_regular_shadow/_PCF_shadow-->
 		<schema tag="COMPONENT" schama=" GlobalConfig: 	@tag/{STRING}
