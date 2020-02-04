@@ -1,4 +1,4 @@
-<root> v 1.2 --- no branch
+<root> v 1.2 --- this is master
 	<schemas> v 1.3
 		<!-- @shadow_light: light tag  @cur_shadow : _no_shadow/_regular_shadow/_PCF_shadow-->
 		<schema tag="COMPONENT" schama=" GlobalConfig: 	@tag/{STRING}
