@@ -1,0 +1,66 @@
+<root>
+	<schemas>
+		<!-- @shadow_light: light tag  @cur_shadow : _no_shadow/_regular_shadow/_PCF_shadow-->
+		<schema tag="COMPONENT" schama=" GlobalConfig: 	@tag/{STRING}
+																					@amb_factor/{FLOAT, FLOAT, FLOAT}
+																					@shadow_light/{STRING}
+																					@cur_shadow/{STRING}
+																					@display_light_wire/{STRING}
+															"/>
+		<!-- for deferred shader @gbuffer: shdow/depth/gbuffer 	 @glight : lightshader for others none -->
+		<schema tag="COMPONENT" schama=" Shader:  @class/{STRING} 
+																			 @tag/{STRING} 
+																			 @program/{STRING}
+																			 @depth_shader/{STRING}
+																			 @shadow_shader/{STRING}
+																			 @gbuffer_shader/{STRING}
+																			 @lighting_shader/{STRING}
+															 "/>
+		<!-- texture -->
+		<schema tag="COMPONENT" schama=" Texture2D:@tag/{STRING} 
+																				@type/{STRING} 
+																				@storage/{STRING}"/>
+		<!-- nearest/bilinear/trilinear -->
+		<schema tag="COMPONENT" schama=" Sampler: 	@tag/{STRING}"/>		
+		<!-- 
+			@type:grid, @defaultParam: width, height, w_div_num, h_div_num, w_max_u_tex_coord, h_max_v_tex_coord
+			@type:cube, @defaultParam: wdge_length
+			@type:sphere, @default/{radius, slice_num, stack_num}
+			@type:torus, @default/{inner_radius, outer_radius, side_num, ring_num}
+		 -->
+		<schema tag="COMPONENT" schama=" Primitive: @tag/{STRING} 
+																				@defaultGeoParam/{...} 
+																				@storage/{STRING}"/>
+		<!-- @geoParam: the same as Primitive or missed, for simplicity, do not use geoParam, instead, use defaultGeoParam in primitive -->
+		<schema tag="COMPONENT" schama=" Model: @type/{STRING} 
+																		   @tag/{STRING} 
+																		   @geoParam/{...} 
+																		   @transform/{...} 
+																		   @rot/{...} 
+																		   @scale/{FLOAT, FLOAT, FLOAT} 
+																		   @mat_Kd/{FLOAT, FLOAT, FLOAT} 
+																		   @mat_Ks/{FLOAT, FLOAT, FLOAT} 
+																		   @shininess/{FLOAT}
+																		   @tex_diffuse/{STRING}
+																		   @tex_normal/{STRING}
+																		   @tex_sampler/{STRING}
+																		   @tex_tile/{FLOAT}"/>
+	</schemas>
+	<entities>
+		<!-- regular 2d texture including diffuse normal texture-->
+		<entity id="A439716E-23EA-41C1-99C5-BC8B3D4D19C2" 
+				component=" Texture2D: @tag/{Brick1} @type/{diffuse} @storage/{brick1.jpg} "/>
+		<entity id="D49E5FC9-46FE-47A3-AA60-6D62E008021A" 
+				component=" Texture2D: @tag/{Floor} @type/{diffuse} @storage/{floor_diffuse.png} "/>
+		<entity id="76358641-ADB4-4571-8AE4-A9808B4CD4FD" 
+				component=" Texture2D: @tag/{Floor_normal} @type/{normal} @storage/{floor_nmap.png} "/>
+		<entity id="ABC46C40-F151-4422-9552-82E06333BE6E" 
+				component=" Texture2D: @tag/{Cement} @type/{diffuse} @storage/{cement.jpg} "/>
+		<entity id="47B16851-A1B2-4499-94A6-5593C2F714CC" 
+				component=" Texture2D: @tag/{Moss} @type/{diffuse} @storage/{moss.png} "/>
+		<entity id="BA90D4C2-72EF-49F9-BEFF-5B451DE538D8" 
+				component=" Texture2D: @tag/{Ogre_diffuse} @type/{diffuse} @storage/{ogre_diffuse.png} "/>
+		<entity id="D7E21C02-DECA-46D5-8B28-28B0B80CD291" 
+				component=" Texture2D: @tag/{Ogre_normalmap} @type/{normal} @storage/{ogre_normalmap.png} "/>	
+	</entities>
+</root>
